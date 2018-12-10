@@ -1,19 +1,42 @@
 pool:
   vmImage: 'VS2017-Win2016'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
 steps:
-  - task: DownloadSecureFile@1
-    inputs:
-      secureFile: SecretConfig.Azure.ps1
-  - task: PowerShell@2
-    inputs:
-      targetType: inline
-      script: 'Get-Item Env:'
-  - task: PowerShell@2
-    name: SecondTask
-    inputs:
-      targetType: inline
-      script: 'cd "C:\Program Files\IIS"; ls'
-  - script: echo Hello $(Agent.TempDirectory) , world!
-    displayName: 'Run a one-line script'
-  - powershell: cd $env:AGENT_TEMPDIRECTORY; ls
-  - powershell: Get-Content $env:DOWNLOADSECUREFILE_SECUREFILEPATH
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: SecretConfig.Azure.ps1
+- task: PowerShell@2
+  inputs:
+    targetType: inline
+    script: 'Get-Item Env:'
+    env:
+      SecretConfigPath: $(Agent.TempDirectory)\SecretConfig.Azure.ps1
+- task: PowerShell@2
+  name: SecondTask
+  inputs:
+    targetType: inline
+    script: 'cd "C:\Program Files\IIS"; ls'
+- script: echo Hello $(Agent.TempDirectory) , world!
+  displayName: 'Run a one-line script'
+- powershell: cd $env:AGENT_TEMPDIRECTORY; ls
+- powershell: Get-Content $env:DOWNLOADSECUREFILE_SECUREFILEPATH
+  
+- task: NuGetToolInstaller@0
+
+- task: NuGetCommand@2
+  inputs:
+    solution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- powershell: cd $env:BUILD_ArtifactStagingDirectory; ls
