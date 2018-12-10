@@ -9,6 +9,7 @@ variables:
 steps:
 #- powershell: Get-ChildItem; git status; git branch; git remote
 - powershell: git checkout -B $env:BUILD_SOURCEBRANCHNAME $env:BUILD_SOURCEVERSION
+  displayName: Git Checkout
 - task: DownloadSecureFile@1
   inputs:
     secureFile: SecretConfig.Azure.ps1
@@ -38,6 +39,7 @@ steps:
 - script: psake build
   env:
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
+    Environment: Development
 
 - task: VSBuild@1
   inputs:
