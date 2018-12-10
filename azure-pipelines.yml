@@ -13,24 +13,24 @@ steps:
 - task: DownloadSecureFile@1
   inputs:
     secureFile: SecretConfig.Azure.ps1
-- script: 'powershell -command "Get-Item Env:"'
-  env:
-    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
-- task: PowerShell@2
-  name: SecondTask
-  inputs:
-    targetType: inline
-    script: 'cd "C:\Program Files\IIS"; ls'
-- script: echo Hello $(Agent.TempDirectory) , world!
-  displayName: 'Run a one-line script'
-- powershell: cd $env:AGENT_TEMPDIRECTORY; ls
-- powershell: Get-Content $env:DOWNLOADSECUREFILE_SECUREFILEPATH
+#- script: 'powershell -command "Get-Item Env:"'
+#  env:
+#    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
+#- task: PowerShell@2
+#  name: SecondTask
+#  inputs:
+#    targetType: inline
+#    script: 'cd "C:\Program Files\IIS"; ls'
+#- script: echo Hello $(Agent.TempDirectory) , world!
+#  displayName: 'Run a one-line script'
+#- powershell: cd $env:AGENT_TEMPDIRECTORY; ls
+#- powershell: Get-Content $env:DOWNLOADSECUREFILE_SECUREFILEPATH
   
-- task: NuGetToolInstaller@0
+#- task: NuGetToolInstaller@0
 
-- task: NuGetCommand@2
-  inputs:
-    solution: '$(solution)'
+#- task: NuGetCommand@2
+#  inputs:
+#    solution: '$(solution)'
 
 - powershell: iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
