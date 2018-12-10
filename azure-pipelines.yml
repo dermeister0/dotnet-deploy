@@ -1,4 +1,3 @@
-name: Just a Test
 pool:
   vmImage: 'VS2017-Win2016'
 steps:
