@@ -12,8 +12,8 @@ steps:
     name: SecondTask
     inputs:
       targetType: inline
-      script: 'cd "C:\Program Files\IIS" && ls'
+      script: 'cd "C:\Program Files\IIS"; ls'
   - script: echo Hello $(Agent.TempDirectory) , world!
     displayName: 'Run a one-line script'
-  - powershell: cd $env:AGENT_TEMPDIRECTORY && ls
+  - powershell: cd $env:AGENT_TEMPDIRECTORY; ls
   - powershell: Get-Content $env:DOWNLOADSECUREFILE_SECUREFILEPATH
