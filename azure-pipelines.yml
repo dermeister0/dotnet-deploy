@@ -6,3 +6,5 @@ steps:
     name: SecondTask
     inputs:
       script: 'cd C:\Program Files\IIS && ls'
+  - script: echo Hello, world!
+    displayName: 'Run a one-line script'
