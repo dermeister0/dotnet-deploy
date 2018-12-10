@@ -7,8 +7,8 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- powershell: Get-ChildItem; git status; git branch; git remote
-
+#- powershell: Get-ChildItem; git status; git branch; git remote
+- powershell: git checkout $env:BUILD_SOURCEBRANCHNAME $env:BUILD_SOURCEVERSION
 - task: DownloadSecureFile@1
   inputs:
     secureFile: SecretConfig.Azure.ps1
