@@ -49,3 +49,8 @@ steps:
     configuration: '$(buildConfiguration)'
 
 - powershell: cd $env:BUILD_ArtifactStagingDirectory; ls
+
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'artifactName'
+    targetPath: $(Build.ArtifactStagingDirectory)
