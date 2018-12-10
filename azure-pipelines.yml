@@ -1,8 +1,11 @@
+name: Just a Test
+pool:
+  vmImage: 'VS2017-Win2016'
 steps:
   - task: PowerShell@2
     inputs:
       targetType: inline
-      script: 'ls env:'
+      script: 'Get-Item Env:'
   - task: PowerShell@2
     name: SecondTask
     inputs:
