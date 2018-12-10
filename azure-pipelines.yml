@@ -10,7 +10,7 @@ steps:
 - task: DownloadSecureFile@1
   inputs:
     secureFile: SecretConfig.Azure.ps1
-- script: 'Get-Item Env:'
+- script: 'powershell -command "Get-Item Env:"'
   env:
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 - task: PowerShell@2
