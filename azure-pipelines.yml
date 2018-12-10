@@ -29,6 +29,14 @@ steps:
   inputs:
     solution: '$(solution)'
 
+- powershell: iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+- script: cinst psake
+
+- script: psake build
+  env:
+    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
+
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
