@@ -35,7 +35,7 @@ steps:
 
 - script: psake package-web
   displayName: Package (Production)
-  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   env:
     Environment: Production
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
