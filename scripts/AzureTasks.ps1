@@ -20,10 +20,13 @@ Task azure-checkout -description 'Checks out to a local branch.' `
             throw "Unexpected tag: $tag"
         }
     }
+    elseif ($env:BUILD_SOURCEBRANCH -match 'refs/heads/(.*)')
+    {
+        $branch = $Matches[1]
+    }
     else
     {
-        'refs/heads/release/0.1.0' -match 'refs/heads/(.*)'
-        $branch = $Matches[1]
+        throw "Wrong reference: $($env:BUILD_SOURCEBRANCH)"
     }
 
     Exec { git checkout -B $branch $env:BUILD_SOURCEVERSION }
