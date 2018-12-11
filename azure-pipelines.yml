@@ -3,54 +3,35 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-jobs:
-- job: Initialize
-  pool:
-    vmImage: 'VS2017-Win2016'
-  steps:
-    - powershell: git checkout -B $env:BUILD_SOURCEBRANCHNAME $env:BUILD_SOURCEVERSION
-      displayName: Git Checkout
-    - task: DownloadSecureFile@1
-      inputs:
-        secureFile: SecretConfig.Azure.ps1
-    - powershell: iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-      displayName: Install Chocolatey
-    - script: cinst psake
-      displayName: Install psake
+pool:
+  vmImage: 'VS2017-Win2016'
 
-- job: BuildDevelopment
-  pool:
-    vmImage: 'VS2017-Win2016'
-  dependsOn:
-  - Initialize
+steps:
+- powershell: git checkout -B $env:BUILD_SOURCEBRANCHNAME $env:BUILD_SOURCEVERSION
+  displayName: Git Checkout
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: SecretConfig.Azure.ps1
+- powershell: iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+  displayName: Install Chocolatey
+- script: cinst psake
+  displayName: Install psake
+
+- script: psake package-web
   condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'develop'))
-  variables:
+  env:
     Environment: Development
-  steps:
-  - script: psake package-web
-    env:
-      SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
+    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- job: BuildStaging
-  pool:
-    vmImage: 'VS2017-Win2016'
-  dependsOn:
-  - Initialize
+- script: psake package-web
   condition: and(succeeded(), startsWith(variables['Build.SourceBranchName'], 'release/'))
-  variables:
+  env:
     Environment: Staging
-  steps:
-    - script: psake package-web
-      env:
-        SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
+    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- job: PublishArtifact
-  pool:
-    vmImage: 'VS2017-Win2016'
-  steps:
-  - powershell: cd out; ls
+- powershell: cd out; ls
 
-  - task: PublishPipelineArtifact@0
-    inputs:
-      artifactName: 'artifactName'
-      targetPath: out
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'artifactName'
+    targetPath: out
