@@ -6,51 +6,44 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-steps:
-#- powershell: Get-ChildItem; git status; git branch; git remote
-- powershell: git checkout -B $env:BUILD_SOURCEBRANCHNAME $env:BUILD_SOURCEVERSION
-  displayName: Git Checkout
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: SecretConfig.Azure.ps1
-#- script: 'powershell -command "Get-Item Env:"'
-#  env:
-#    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
-#- task: PowerShell@2
-#  name: SecondTask
-#  inputs:
-#    targetType: inline
-#    script: 'cd "C:\Program Files\IIS"; ls'
-#- script: echo Hello $(Agent.TempDirectory) , world!
-#  displayName: 'Run a one-line script'
-#- powershell: cd $env:AGENT_TEMPDIRECTORY; ls
-#- powershell: Get-Content $env:DOWNLOADSECUREFILE_SECUREFILEPATH
-  
-#- task: NuGetToolInstaller@0
+jobs:
+- job: Initialize
+  steps:
+    - powershell: git checkout -B $env:BUILD_SOURCEBRANCHNAME $env:BUILD_SOURCEVERSION
+      displayName: Git Checkout
+    - task: DownloadSecureFile@1
+      inputs:
+        secureFile: SecretConfig.Azure.ps1
+    - powershell: iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      displayName: Install Chocolatey
+    - script: cinst psake
+      displayName: Install psake
 
-#- task: NuGetCommand@2
-#  inputs:
-#    solution: '$(solution)'
-
-- powershell: iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-
-- script: cinst psake
-
-- script: psake build
-  env:
-    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
+- job: BuildDevelopment
+  dependsOn:
+  - Initialize
+  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'develop'))
+  variables:
     Environment: Development
+  steps:
+  - script: psake package-web
+    env:
+      SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+- job: BuildStaging
+  dependsOn:
+  - Initialize
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranchName'], 'release/'))
+  variables:
+    Environment: Staging
+  steps:
+    - script: psake package-web
+      env:
+        SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- powershell: cd $env:BUILD_ArtifactStagingDirectory; ls
+- powershell: cd out; ls
 
 - task: PublishPipelineArtifact@0
   inputs:
     artifactName: 'artifactName'
-    targetPath: $(Build.ArtifactStagingDirectory)
+    targetPath: out

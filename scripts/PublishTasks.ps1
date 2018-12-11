@@ -25,20 +25,25 @@ Task pre-publish -depends pre-build -description 'Set common publish settings fo
     }
 }
 
-Task publish-web -depends pre-publish -description '* Publish all web apps to specified server.' `
-    -requiredVariables @('Configuration', 'WebServer', 'SiteName') `
+Task package-web -description 'Package web app to ZIP archive.' `
+    -requiredVariables @('Configuration') `
 {
-
     $buildParams = @("/p:Environment=$Environment")
 
+    $outDir = "$workspace\out"
+    New-Item -ItemType Directory $outDir -ErrorAction SilentlyContinue
 
     $projectName = 'DeployDemo.Web'
-    $packagePath = "$workspace\$projectName.zip"
+    $packagePath = "$outDir\$projectName.zip"
     Invoke-PackageBuild -ProjectPath "$src\$projectName\$projectName.csproj" `
         -PackagePath $packagePath -Configuration $Configuration -BuildParams $buildParams
-    Invoke-WebDeployment -PackagePath $packagePath -ServerHost $WebServer `
-        -SiteName $SiteName -Application ''
-
 }
 
-
+Task publish-web -depends pre-publish, package-web -description '* Publish all web apps to specified server.' `
+    -requiredVariables @('Configuration', 'WebServer', 'SiteName') `
+{
+    $projectName = 'DeployDemo.Web'
+    $packagePath = "$workspace\out\$projectName.zip"
+    Invoke-WebDeployment -PackagePath $packagePath -ServerHost $WebServer `
+        -SiteName $SiteName -Application ''
+}
