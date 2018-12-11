@@ -43,7 +43,7 @@ Task copy-configs -description 'Create configs based on App.config.template and 
     $configFilename = "$workspace\Config.$Environment.ps1"
     $templateFilename = "$workspace\Config.$Environment.ps1.template"
 
-    if (!(Test-Path $configFilename) -and (Test-Path $templateFilename))
+    if ($IsLocalDevelopment -and !(Test-Path $configFilename) -and (Test-Path $templateFilename))
     {
         Write-Warning "Did you forget to copy $templateFilename to $($configFilename)?"
         return
@@ -76,7 +76,7 @@ Task update-version -description 'Replace package version in web project.' `
     -depends get-version `
     -requiredVariables @('AssemblySemVer', 'InformationalVersion') `
 {
-    if ($Environment -eq 'Development') # It's a developer machine.
+    if ($IsLocalDevelopment) # It's a developer machine.
     {
         return
     }
