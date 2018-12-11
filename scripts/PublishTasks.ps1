@@ -25,7 +25,7 @@ Task pre-publish -depends pre-build -description 'Set common publish settings fo
     }
 }
 
-Task package-web -description 'Package web app to ZIP archive.' `
+Task package-web -depends pre-build -description 'Package web app to ZIP archive.' `
     -requiredVariables @('Configuration') `
 {
     $buildParams = @("/p:Environment=$Environment")
