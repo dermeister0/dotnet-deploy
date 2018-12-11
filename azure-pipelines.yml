@@ -20,18 +20,25 @@ steps:
 - powershell: 'Get-Item Env:'
 
 - script: psake package-web
+  displayName: Package (Development)
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   env:
     Environment: Development
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
 - script: psake package-web
+  displayName: Package (Staging)
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))
   env:
     Environment: Staging
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- powershell: cd out; ls
+- script: psake package-web
+  displayName: Package (Production)
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/master'))
+  env:
+    Environment: Production
+    SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
 - task: PublishPipelineArtifact@0
   inputs:
