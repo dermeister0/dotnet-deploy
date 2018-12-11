@@ -6,6 +6,7 @@ $env:PSModulePath += [IO.Path]::PathSeparator + [IO.Path]::Combine($PSScriptRoot
 . .\scripts\Saritasa.BuildTasks.ps1
 . .\scripts\Saritasa.PsakeTasks.ps1
 
+. .\scripts\AzureTasks.ps1
 . .\scripts\BuildTasks.ps1
 . .\scripts\PublishTasks.ps1
 
