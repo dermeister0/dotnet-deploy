@@ -35,12 +35,13 @@ steps:
 
 - script: psake package-web
   displayName: Package (Production)
-  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/master'))
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   env:
     Environment: Production
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
 - task: PublishPipelineArtifact@0
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/tags/')))
   inputs:
     artifactName: 'artifactName'
     targetPath: out
