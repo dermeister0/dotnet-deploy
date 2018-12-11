@@ -17,14 +17,16 @@ steps:
 - script: cinst psake
   displayName: Install psake
 
+- powershell: Get-Item Env:
+
 - script: psake package-web
-  condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'develop'))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   env:
     Environment: Development
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
 - script: psake package-web
-  condition: and(succeeded(), startsWith(variables['Build.SourceBranchName'], 'release/'))
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))
   env:
     Environment: Staging
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
