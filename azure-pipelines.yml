@@ -62,3 +62,7 @@ steps:
   inputs:
     artifactName: 'WebProduction'
     targetPath: out
+
+- script: echo "##vso[build.addbuildtag]ProductionRelease" 
+  displayName: Add Build Tag
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
