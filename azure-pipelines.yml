@@ -23,11 +23,6 @@ steps:
 
 - powershell: Write-Host '##vso[task.setvariable variable=Environment;]Development'
   displayName: Set Environment (Development)
-
-
-
-- powershell: Write-Host '##vso[task.setvariable variable=Environment;]Development'
-  displayName: Set Environment (Development)
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   env:
     Environment: Development
@@ -46,6 +41,9 @@ steps:
   env:
     Environment: Production
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
+
+- powershell: 'Get-Item Env:'
+  displayName: Get Environment Variables
 
 - script: psake package-web
   displayName: Package
