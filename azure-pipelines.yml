@@ -43,7 +43,22 @@ steps:
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
 - task: PublishPipelineArtifact@0
-  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/tags/')))
+  displayName: Publish Artifact (Development)
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   inputs:
-    artifactName: 'artifactName'
+    artifactName: 'WebDevelopment'
+    targetPath: out
+
+- task: PublishPipelineArtifact@0
+  displayName: Publish Artifact (Staging)
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))
+  inputs:
+    artifactName: 'WebStaging'
+    targetPath: out
+
+- task: PublishPipelineArtifact@0
+  displayName: Publish Artifact (Production)
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+  inputs:
+    artifactName: 'WebProduction'
     targetPath: out
