@@ -42,7 +42,7 @@ steps:
     Environment: Production
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- powershell: Write-Host "##vso[build.addbuildtag]$($Environment)Release"
+- powershell: Write-Host "##vso[build.addbuildtag]$($env:Environment)Release"
   displayName: Add Build Tag
 
 - script: psake package-web
