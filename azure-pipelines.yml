@@ -28,14 +28,14 @@ steps:
     Environment: Development
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- powershell: Write-Host '##vso[task.setvariable variable=Environment;]Development'
+- powershell: Write-Host '##vso[task.setvariable variable=Environment;]Staging'
   displayName: Set Environment (Staging)
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))
   env:
     Environment: Staging
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- powershell: Write-Host '##vso[task.setvariable variable=Environment;]Development'
+- powershell: Write-Host '##vso[task.setvariable variable=Environment;]Production'
   displayName: Set Environment (Production)
   condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
   env:
