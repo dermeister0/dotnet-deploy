@@ -42,8 +42,8 @@ steps:
     Environment: Production
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
-- powershell: 'Get-Item Env:'
-  displayName: Get Environment Variables
+- powershell: Write-Host "##vso[build.addbuildtag]$($Environment)Release"
+  displayName: Add Build Tag
 
 - script: psake package-web
   displayName: Package
@@ -51,26 +51,7 @@ steps:
     SecretConfigPath: '$(Agent.TempDirectory)\SecretConfig.Azure.ps1'
 
 - task: PublishPipelineArtifact@0
-  displayName: Publish Artifact (Development)
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+  displayName: Publish Artifact
   inputs:
-    artifactName: 'WebDevelopment'
+    artifactName: 'WebPackage'
     targetPath: out
-
-- task: PublishPipelineArtifact@0
-  displayName: Publish Artifact (Staging)
-  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))
-  inputs:
-    artifactName: 'WebStaging'
-    targetPath: out
-
-- task: PublishPipelineArtifact@0
-  displayName: Publish Artifact (Production)
-  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
-  inputs:
-    artifactName: 'WebProduction'
-    targetPath: out
-
-- powershell: Write-Host '##vso[build.addbuildtag]ProductionRelease'
-  displayName: Add Build Tag
-  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
